@@ -2,7 +2,7 @@
   publish = "public"
   command = """
     echo "Installing dependencies..."
-    npm ci --production
+    npm ci --omit=dev
     echo "Creating directories..."
     mkdir -p functions/content/posts public/content/posts
     echo "Copying posts..."
