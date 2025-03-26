@@ -11,17 +11,33 @@ exports.handler = async function(event, context) {
     try {
         console.log('Fetching posts...');
         
-        // In production, files are in the same directory as the function
-        const postsDir = path.join(__dirname, 'content', 'posts');
-        console.log('Posts directory:', postsDir);
-
-        // List all files in the posts directory
-        let files;
-        try {
-            files = await fs.readdir(postsDir);
-            console.log('Found files:', files);
-        } catch (err) {
-            console.error('Error reading directory:', err);
+        // Try multiple possible paths for the posts directory
+        const possiblePaths = [
+            path.join(__dirname, 'content', 'posts'),
+            path.join(__dirname, '..', 'content', 'posts'),
+            path.join(process.cwd(), 'content', 'posts')
+        ];
+        
+        let postsDir;
+        let files = [];
+        
+        // Try each path until we find one that works
+        for (const dir of possiblePaths) {
+            try {
+                console.log('Trying directory:', dir);
+                await fs.access(dir);
+                postsDir = dir;
+                files = await fs.readdir(dir);
+                console.log('Successfully found posts in:', dir);
+                console.log('Files found:', files);
+                break;
+            } catch (err) {
+                console.log('Directory not accessible:', dir, err.message);
+            }
+        }
+        
+        if (!postsDir || files.length === 0) {
+            console.log('No valid posts directory found or directory is empty');
             return {
                 statusCode: 200,
                 headers: {
@@ -41,7 +57,9 @@ exports.handler = async function(event, context) {
                 .filter(file => file.endsWith('.md'))
                 .map(async (file) => {
                     try {
-                        const content = await fs.readFile(path.join(postsDir, file), 'utf-8');
+                        const filePath = path.join(postsDir, file);
+                        console.log('Reading file:', filePath);
+                        const content = await fs.readFile(filePath, 'utf-8');
                         const { data, content: markdown } = matter(content);
                         return {
                             ...data,
@@ -72,7 +90,7 @@ exports.handler = async function(event, context) {
     } catch (error) {
         console.error('Error in handler:', error);
         return {
-            statusCode: 200, // Return 200 even on error, with empty array
+            statusCode: 200,
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
