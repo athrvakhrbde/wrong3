@@ -199,7 +199,8 @@
             try {
                 const response = await fetch('/content/posts', {
                     headers: {
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
                     }
                 });
                 
@@ -225,7 +226,7 @@
                                 ${formatDate(post.date)} • ${post.categories || 'uncategorized'}
                             </div>
                             <div class="post-excerpt">
-                                ${post.body.slice(0, 200)}...
+                                ${post.body ? post.body.slice(0, 200) + '...' : ''}
                             </div>
                         </article>
                     `).join('');

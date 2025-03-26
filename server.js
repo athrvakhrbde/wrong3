@@ -13,9 +13,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Serve static files from public directory
-app.use(express.static('public'));
-
 // Create necessary directories
 const createDirectories = async () => {
     const dirs = [
@@ -34,7 +31,7 @@ const createDirectories = async () => {
 
 createDirectories().catch(console.error);
 
-// Endpoint to get all posts
+// API endpoint to get all posts
 app.get('/content/posts', async (req, res) => {
     try {
         const postsDirectory = path.join(__dirname, 'content', 'posts');
@@ -74,9 +71,16 @@ app.get('/content/posts', async (req, res) => {
     }
 });
 
-// Handle all other routes
+// Serve static files from public directory
+app.use(express.static('public'));
+
+// Handle all other routes - serve index.html for client-side routing
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    if (req.accepts('html')) {
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    } else {
+        res.status(404).json({ error: 'Not found' });
+    }
 });
 
 app.listen(PORT, () => {
