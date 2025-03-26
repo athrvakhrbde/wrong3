@@ -3,12 +3,9 @@
   command = "npm run build"
   functions = "functions"
 
-[functions]
-  directory = "functions"
-
 [[redirects]]
   from = "/content/*"
-  to = "/.netlify/functions/server/:splat"
+  to = "/.netlify/functions/server"
   status = 200
 
 [[redirects]]

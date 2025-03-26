@@ -1,12 +1,13 @@
-const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const matter = require('gray-matter');
 
-const app = express();
+exports.handler = async function(event, context) {
+    // Only allow GET requests
+    if (event.httpMethod !== 'GET') {
+        return { statusCode: 405, body: 'Method Not Allowed' };
+    }
 
-// API endpoint to fetch posts
-app.get('/content/posts', async (req, res) => {
     try {
         console.log('Fetching posts...');
         const postsDir = path.join(process.cwd(), 'content', 'posts');
@@ -25,17 +26,24 @@ app.get('/content/posts', async (req, res) => {
                 })
         );
         console.log(`Found ${posts.length} posts`);
-        res.json(posts.sort((a, b) => new Date(b.date) - new Date(a.date)));
+        
+        return {
+            statusCode: 200,
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify(posts.sort((a, b) => new Date(b.date) - new Date(a.date)))
+        };
     } catch (error) {
         console.error('Error reading posts:', error);
-        res.json([]);
+        return {
+            statusCode: 200,
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify([])
+        };
     }
-});
-
-// Handle all other routes
-app.get('*', (req, res) => {
-    res.status(404).json({ error: 'Not found' });
-});
-
-// Export the Express app as a Netlify function
-exports.handler = app; 
+}; 
