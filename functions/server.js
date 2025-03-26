@@ -10,12 +10,15 @@ exports.handler = async function(event, context) {
 
     try {
         console.log('Fetching posts...');
+        console.log('Current directory:', process.cwd());
+        console.log('Function directory:', __dirname);
         
         // Try multiple possible paths for the posts directory
         const possiblePaths = [
             path.join(__dirname, 'content', 'posts'),
             path.join(__dirname, '..', 'content', 'posts'),
-            path.join(process.cwd(), 'content', 'posts')
+            path.join(process.cwd(), 'content', 'posts'),
+            '/opt/build/repo/content/posts'  // Netlify build directory
         ];
         
         let postsDir;
@@ -25,12 +28,14 @@ exports.handler = async function(event, context) {
         for (const dir of possiblePaths) {
             try {
                 console.log('Trying directory:', dir);
-                await fs.access(dir);
-                postsDir = dir;
-                files = await fs.readdir(dir);
-                console.log('Successfully found posts in:', dir);
-                console.log('Files found:', files);
-                break;
+                const stats = await fs.stat(dir);
+                if (stats.isDirectory()) {
+                    postsDir = dir;
+                    files = await fs.readdir(dir);
+                    console.log('Successfully found posts in:', dir);
+                    console.log('Files found:', files);
+                    break;
+                }
             } catch (err) {
                 console.log('Directory not accessible:', dir, err.message);
             }
@@ -38,6 +43,13 @@ exports.handler = async function(event, context) {
         
         if (!postsDir || files.length === 0) {
             console.log('No valid posts directory found or directory is empty');
+            // Try to list the root directory to understand the structure
+            try {
+                const rootFiles = await fs.readdir(process.cwd());
+                console.log('Root directory contents:', rootFiles);
+            } catch (err) {
+                console.log('Could not read root directory:', err.message);
+            }
             return {
                 statusCode: 200,
                 headers: {
@@ -60,6 +72,7 @@ exports.handler = async function(event, context) {
                         const filePath = path.join(postsDir, file);
                         console.log('Reading file:', filePath);
                         const content = await fs.readFile(filePath, 'utf-8');
+                        console.log('File content:', content.substring(0, 100) + '...');
                         const { data, content: markdown } = matter(content);
                         return {
                             ...data,
@@ -74,7 +87,7 @@ exports.handler = async function(event, context) {
         );
 
         const validPosts = posts.filter(post => post !== null);
-        console.log(`Found ${validPosts.length} valid posts`);
+        console.log(`Found ${validPosts.length} valid posts:`, validPosts.map(p => p.title));
         
         return {
             statusCode: 200,
