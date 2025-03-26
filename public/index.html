@@ -198,14 +198,25 @@
         async function loadPosts() {
             try {
                 console.log('Fetching posts from API...');
-                const response = await fetch('/content/posts');
+                const response = await fetch('/content/posts', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    mode: 'cors',
+                    credentials: 'same-origin'
+                });
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                
                 const posts = await response.json();
                 console.log('Received posts:', posts);
                 
                 const postsContainer = document.getElementById('posts-container');
+                
                 if (!posts || posts.length === 0) {
                     postsContainer.innerHTML = `
                         <div class="text-center py-12">

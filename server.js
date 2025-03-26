@@ -7,8 +7,13 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enable CORS for all routes
-app.use(cors());
+// Enable CORS for all routes with specific options
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
 // Create necessary directories if they don't exist
 const postsDir = path.join(__dirname, 'content', 'posts');
@@ -37,9 +42,21 @@ app.get('/content/posts', async (req, res) => {
                 })
         );
         console.log(`Found ${posts.length} posts`);
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Permissions-Policy', 'interest-cohort=()');
+        
         res.json(posts.sort((a, b) => new Date(b.date) - new Date(a.date)));
     } catch (error) {
         console.error('Error reading posts:', error);
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Permissions-Policy', 'interest-cohort=()');
         res.json([]);
     }
 });
