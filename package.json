@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "npm install",
+    "build": "npm install --legacy-peer-deps",
     "dev": "netlify dev"
   },
   "keywords": [],
@@ -14,7 +14,9 @@
   "dependencies": {
     "express": "^4.18.3",
     "gray-matter": "^4.0.3",
-    "decap-cms-app": "^3.0.12"
+    "decap-cms-app": "^3.0.12",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "netlify-cli": "^17.0.0"

@@ -1,6 +1,6 @@
 [build]
   publish = "public"
-  command = "npm install"
+  command = "npm run build"
 
 [[redirects]]
   from = "/*"
@@ -9,6 +9,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 [dev]
   command = "npm start"
