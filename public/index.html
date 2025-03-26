@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wrong</title>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <style>
         * {
             margin: 0;
@@ -44,16 +45,12 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             padding: 2rem 0;
         }
 
         .content {
             text-align: center;
-        }
-
-        .section {
-            margin-bottom: 2rem;
+            margin-bottom: 4rem;
         }
 
         h1 {
@@ -86,6 +83,38 @@
 
         .links a:hover {
             color: #fff;
+        }
+
+        .posts {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .post {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        .post:hover {
+            border-color: #666;
+        }
+
+        .post h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .post-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .post-excerpt {
+            color: #888;
         }
 
         footer {
@@ -131,6 +160,10 @@
                     <a href="#contact">contact</a>
                 </div>
             </div>
+
+            <div class="posts" id="posts-container">
+                <!-- Posts will be loaded here -->
+            </div>
         </div>
     </main>
 
@@ -139,5 +172,57 @@
             <p>© 2024 wrong</p>
         </div>
     </footer>
+
+    <script>
+        // Function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Function to load posts
+        async function loadPosts() {
+            try {
+                const response = await fetch('/content/posts');
+                const posts = await response.json();
+                const postsContainer = document.getElementById('posts-container');
+                
+                posts.forEach(post => {
+                    const postElement = document.createElement('article');
+                    postElement.className = 'post';
+                    postElement.innerHTML = `
+                        <h2>${post.title}</h2>
+                        <div class="post-meta">
+                            ${formatDate(post.date)} • ${post.categories}
+                        </div>
+                        <div class="post-excerpt">
+                            ${post.body.substring(0, 200)}...
+                        </div>
+                    `;
+                    postsContainer.appendChild(postElement);
+                });
+            } catch (error) {
+                console.error('Error loading posts:', error);
+            }
+        }
+
+        // Load posts when the page loads
+        document.addEventListener('DOMContentLoaded', loadPosts);
+
+        // Handle Netlify Identity
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+                if (!user) {
+                    window.netlifyIdentity.on("login", () => {
+                        document.location.href = "/admin/";
+                    });
+                }
+            });
+        }
+    </script>
 </body>
 </html>

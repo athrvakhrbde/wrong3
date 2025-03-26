@@ -5,4 +5,12 @@
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
+
+[dev]
+  framework = "#static"
+  command = "npm start"
+  targetPort = 8888
+  port = 8888
+  publish = "public"
+  autoLaunch = true 
