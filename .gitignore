@@ -16,10 +16,9 @@ Gemfile.lock
 **/vendor/bundle
 
 # Node.js and NPM
-node_modules
-npm-debug.log*
-package-lock.json
-codekit-config.json
+node_modules/
+dist/
+.env
 
 # macOS
 .DS_Store
@@ -32,4 +31,4 @@ _asset_bundler_cache
 _site
 
 # Local Netlify folder
-.netlify
+.netlify/
