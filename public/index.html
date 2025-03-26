@@ -204,8 +204,7 @@
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    mode: 'cors',
-                    credentials: 'same-origin'
+                    cache: 'no-cache'
                 });
                 
                 if (!response.ok) {
@@ -220,12 +219,11 @@
                 if (!posts || posts.length === 0) {
                     postsContainer.innerHTML = `
                         <div style="text-align: center; padding: 2rem 0;">
-                            <p style="color: #888; margin-bottom: 1rem;">No posts found. Be the first to create one!</p>
-                            <a href="/admin" style="display: inline-block; background-color: #333; color: #fff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; transition: background-color 0.3s ease;">
-                                Create Post
-                            </a>
+                            <p style="color: #888; margin-bottom: 1rem;">Loading posts...</p>
                         </div>
                     `;
+                    // Try to fetch posts again after a short delay
+                    setTimeout(loadPosts, 2000);
                     return;
                 }
                 
@@ -236,11 +234,11 @@
                         <div class="post-meta">
                             ${formatDate(post.date)}
                             ${post.categories ? `
-                                • ${post.categories.join(', ')}
+                                • ${post.categories}
                             ` : ''}
                         </div>
                         <div class="post-excerpt">
-                            ${post.body.substring(0, 200)}...
+                            ${post.body}
                         </div>
                     </article>
                 `).join('');
@@ -249,16 +247,18 @@
                 const postsContainer = document.getElementById('posts-container');
                 postsContainer.innerHTML = `
                     <div style="text-align: center; padding: 2rem 0;">
-                        <p style="color: #ff6b6b;">Error loading posts. Please try again later.</p>
+                        <p style="color: #ff6b6b;">Error loading posts. Retrying...</p>
                     </div>
                 `;
+                // Try to fetch posts again after a short delay
+                setTimeout(loadPosts, 2000);
             }
         }
 
         // Load posts when the page loads
         document.addEventListener('DOMContentLoaded', loadPosts);
 
-        // Handle Netlify Identity
+        // Reload posts when the CMS updates
         if (window.netlifyIdentity) {
             window.netlifyIdentity.on("init", user => {
                 if (!user) {
@@ -267,7 +267,15 @@
                     });
                 }
             });
+            
+            // Reload posts when returning from the CMS
+            window.netlifyIdentity.on("logout", () => {
+                loadPosts();
+            });
         }
+
+        // Periodically check for new posts
+        setInterval(loadPosts, 10000);
     </script>
 </body>
 </html>
