@@ -10,8 +10,46 @@
     <script>
       window.CMS_MANUAL_INIT = true;
     </script>
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
     <script>
+      // Initialize the CMS when the script is loaded
+      window.addEventListener('load', function() {
+        CMS.init({
+          config: {
+            load_config_file: false,
+            backend: {
+              name: 'git-gateway',
+              branch: 'master'
+            },
+            local_backend: {
+              url: 'http://localhost:8082/api/v1'
+            },
+            media_folder: 'public/images',
+            public_folder: '/images',
+            collections: [{
+              name: 'blog',
+              label: 'Blog Posts',
+              folder: 'content/posts',
+              create: true,
+              slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
+              fields: [
+                { label: 'Title', name: 'title', widget: 'string' },
+                { label: 'Publish Date', name: 'date', widget: 'datetime' },
+                { label: 'Featured Image', name: 'thumbnail', widget: 'image', required: false },
+                { label: 'Body', name: 'body', widget: 'markdown' },
+                {
+                  label: 'Categories',
+                  name: 'categories',
+                  widget: 'select',
+                  options: ['thoughts', 'ideas', 'projects', 'other']
+                }
+              ]
+            }]
+          }
+        });
+      });
+
+      // Handle Netlify Identity
       if (window.netlifyIdentity) {
         window.netlifyIdentity.on("init", user => {
           if (!user) {
@@ -21,38 +59,6 @@
           }
         });
       }
-
-      // Initialize the CMS
-      window.decapCMS.init({
-        config: {
-          load_config_file: false,
-          backend: {
-            name: 'git-gateway',
-            branch: 'master'
-          },
-          media_folder: 'public/images',
-          public_folder: '/images',
-          collections: [{
-            name: 'blog',
-            label: 'Blog Posts',
-            folder: 'content/posts',
-            create: true,
-            slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
-            fields: [
-              { label: 'Title', name: 'title', widget: 'string' },
-              { label: 'Publish Date', name: 'date', widget: 'datetime' },
-              { label: 'Featured Image', name: 'thumbnail', widget: 'image', required: false },
-              { label: 'Body', name: 'body', widget: 'markdown' },
-              {
-                label: 'Categories',
-                name: 'categories',
-                widget: 'select',
-                options: ['thoughts', 'ideas', 'projects', 'other']
-              }
-            ]
-          }]
-        }
-      });
     </script>
   </body>
 </html> 
