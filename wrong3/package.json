@@ -8,7 +8,8 @@
     "build": "npm ci --only=production",
     "dev": "concurrently \"npm run dev:cms\" \"npm run dev:server\"",
     "dev:cms": "PORT=8082 netlify-cms-proxy-server",
-    "dev:server": "NODE_ENV=development node server.js"
+    "dev:server": "PORT=4000 NODE_ENV=development node server.js",
+    "clean": "pkill -f 'node|netlify' || true"
   },
   "dependencies": {
     "express": "^4.18.2",
