@@ -6,32 +6,48 @@ const matter = require('gray-matter');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from public directory
-app.use(express.static('public'));
-
-// Enable CORS for development
+// Enable CORS
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
 });
 
+// Serve static files from public directory
+app.use(express.static('public'));
+
+// Create necessary directories
+const createDirectories = async () => {
+    const dirs = [
+        path.join(__dirname, 'content', 'posts'),
+        path.join(__dirname, 'public', 'images')
+    ];
+    
+    for (const dir of dirs) {
+        try {
+            await fs.access(dir);
+        } catch {
+            await fs.mkdir(dir, { recursive: true });
+        }
+    }
+};
+
+createDirectories().catch(console.error);
+
 // Endpoint to get all posts
 app.get('/content/posts', async (req, res) => {
     try {
         const postsDirectory = path.join(__dirname, 'content', 'posts');
+        let files;
         
-        // Create posts directory if it doesn't exist
         try {
-            await fs.access(postsDirectory);
+            files = await fs.readdir(postsDirectory);
         } catch {
-            await fs.mkdir(postsDirectory, { recursive: true });
+            // If directory doesn't exist or is empty
             res.json([]);
             return;
         }
 
-        const files = await fs.readdir(postsDirectory);
-        
         const posts = await Promise.all(
             files
                 .filter(file => file.endsWith('.md'))
@@ -49,20 +65,14 @@ app.get('/content/posts', async (req, res) => {
                 })
         );
 
+        // Set proper content type and send JSON response
+        res.setHeader('Content-Type', 'application/json');
         res.json(posts.sort((a, b) => new Date(b.date) - new Date(a.date)));
     } catch (error) {
         console.error('Error reading posts:', error);
-        if (error.code === 'ENOENT') {
-            res.json([]); // Return empty array if directory doesn't exist
-        } else {
-            res.status(500).json({ error: 'Error reading posts' });
-        }
+        res.status(500).json({ error: 'Error reading posts' });
     }
 });
-
-// Create images directory if it doesn't exist
-const imagesDir = path.join(__dirname, 'public', 'images');
-fs.mkdir(imagesDir, { recursive: true }).catch(console.error);
 
 // Handle all other routes
 app.get('*', (req, res) => {

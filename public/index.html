@@ -194,41 +194,41 @@
             });
         }
 
-        // Function to create post HTML
-        function createPostHTML(post) {
-            return `
-                <article class="post">
-                    ${post.thumbnail ? `<img src="${post.thumbnail}" alt="${post.title}" class="post-image">` : ''}
-                    <h2>${post.title}</h2>
-                    <div class="post-meta">
-                        ${formatDate(post.date)} • ${post.categories || 'uncategorized'}
-                    </div>
-                    <div class="post-excerpt">
-                        ${post.body.slice(0, 200)}...
-                    </div>
-                </article>
-            `;
-        }
-
         // Function to load posts
         async function loadPosts() {
             try {
-                const response = await fetch('content/posts');
+                const response = await fetch('/content/posts', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
                 if (!response.ok) {
-                    throw new Error('Failed to fetch posts');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                
                 const posts = await response.json();
                 const postsContainer = document.getElementById('posts-container');
                 
-                if (posts.length === 0) {
+                if (!posts || posts.length === 0) {
                     postsContainer.innerHTML = '<p style="text-align: center; color: #666;">No posts yet. Create one in the <a href="/admin" style="color: #888;">admin panel</a>.</p>';
                     return;
                 }
 
                 postsContainer.innerHTML = posts
                     .sort((a, b) => new Date(b.date) - new Date(a.date))
-                    .map(createPostHTML)
-                    .join('');
+                    .map(post => `
+                        <article class="post">
+                            ${post.thumbnail ? `<img src="${post.thumbnail}" alt="${post.title}" class="post-image">` : ''}
+                            <h2>${post.title}</h2>
+                            <div class="post-meta">
+                                ${formatDate(post.date)} • ${post.categories || 'uncategorized'}
+                            </div>
+                            <div class="post-excerpt">
+                                ${post.body.slice(0, 200)}...
+                            </div>
+                        </article>
+                    `).join('');
             } catch (error) {
                 console.error('Error loading posts:', error);
                 document.getElementById('posts-container').innerHTML = 
