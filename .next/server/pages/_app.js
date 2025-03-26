@@ -1,0 +1,1 @@
+"use strict";(()=>{var r={};r.id=888,r.ids=[888],r.modules={597:(r,e,_)=>{_.r(e),_.d(e,{default:()=>__WEBPACK_DEFAULT_EXPORT__});var t=_(997);let __WEBPACK_DEFAULT_EXPORT__=function({Component:r,pageProps:e}){return t.jsx(r,{...e})}},997:r=>{r.exports=require("react/jsx-runtime")}};var e=require("../webpack-runtime.js");e.C(r);var _=e(e.s=597);module.exports=_})();
