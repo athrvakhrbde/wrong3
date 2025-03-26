@@ -5,7 +5,13 @@
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "18"
-  NPM_FLAGS = "--no-optional"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  [plugins.inputs]
+    skipBuild = false
+    skipInstall = false
+
+[functions]
+  node_bundler = "esbuild"
