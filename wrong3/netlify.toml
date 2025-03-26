@@ -2,7 +2,7 @@
   publish = "public"
   command = """
     echo "Installing dependencies..."
-    npm install
+    npm ci --legacy-peer-deps
     echo "Creating directories..."
     mkdir -p functions/content/posts public/content/posts
     echo "Copying posts..."
