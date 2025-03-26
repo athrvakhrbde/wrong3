@@ -6,7 +6,7 @@ const matter = require('gray-matter');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enable CORS for all routes
+// Enable CORS
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -35,17 +35,17 @@ const createDirectories = async () => {
 
 createDirectories().catch(console.error);
 
-// API endpoint to get all posts
+// API endpoint to get all posts - MUST come before static file serving
 app.get('/content/posts', async (req, res) => {
+    console.log('Fetching posts...');
     try {
         const postsDirectory = path.join(__dirname, 'content', 'posts');
         let files;
         
         try {
             files = await fs.readdir(postsDirectory);
-        } catch {
-            // If directory doesn't exist or is empty
-            res.setHeader('Content-Type', 'application/json');
+        } catch (error) {
+            console.log('No posts directory or empty:', error);
             res.json([]);
             return;
         }
@@ -67,8 +67,7 @@ app.get('/content/posts', async (req, res) => {
                 })
         );
 
-        // Set proper content type and send JSON response
-        res.setHeader('Content-Type', 'application/json');
+        console.log(`Found ${posts.length} posts`);
         res.json(posts.sort((a, b) => new Date(b.date) - new Date(a.date)));
     } catch (error) {
         console.error('Error reading posts:', error);
@@ -79,13 +78,9 @@ app.get('/content/posts', async (req, res) => {
 // Serve static files from public directory
 app.use(express.static('public'));
 
-// Handle all other routes - serve index.html for client-side routing
+// Handle all other routes
 app.get('*', (req, res) => {
-    if (req.accepts('html')) {
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
-    } else {
-        res.status(404).json({ error: 'Not found' });
-    }
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
