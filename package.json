@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "build": "npm install --legacy-peer-deps",
-    "dev": "netlify dev"
+    "dev": "node server.js"
   },
   "keywords": [],
   "author": "",

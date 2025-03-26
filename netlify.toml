@@ -3,6 +3,11 @@
   command = "npm run build"
 
 [[redirects]]
+  from = "/content/*"
+  to = "/.netlify/functions/content/:splat"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
@@ -14,7 +19,7 @@
 [dev]
   command = "npm start"
   targetPort = 3000
-  port = 3000
+  port = 8000
   framework = "#custom"
 
 [[plugins]]
