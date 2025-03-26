@@ -2,26 +2,14 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const matter = require('gray-matter');
-const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Enable CORS for all routes
-app.use(cors());
-
-// Create necessary directories if they don't exist
-const postsDir = path.join(__dirname, 'content', 'posts');
-const imagesDir = path.join(__dirname, 'public', 'images');
-
-// Ensure directories exist
-fs.mkdir(postsDir, { recursive: true }).catch(console.error);
-fs.mkdir(imagesDir, { recursive: true }).catch(console.error);
 
 // API endpoint to fetch posts
 app.get('/content/posts', async (req, res) => {
     try {
         console.log('Fetching posts...');
+        const postsDir = path.join(process.cwd(), 'content', 'posts');
         const files = await fs.readdir(postsDir);
         const posts = await Promise.all(
             files
@@ -44,14 +32,10 @@ app.get('/content/posts', async (req, res) => {
     }
 });
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Handle all other routes by sending index.html
+// Handle all other routes
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.status(404).json({ error: 'Not found' });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-}); 
+// Export the Express app as a Netlify function
+exports.handler = app; 
