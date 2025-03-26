@@ -12,13 +12,12 @@ app.use(cors());
 
 // Function to get posts directory based on environment
 const getPostsDirectory = () => {
-  const possiblePaths = [
-    path.join(__dirname, 'content', 'posts'),
-    path.join(process.cwd(), 'content', 'posts'),
-    '/opt/build/repo/content/posts'
-  ];
-  
-  return possiblePaths[0]; // In production, this will be the correct path
+  if (process.env.NETLIFY) {
+    // In Netlify Functions, __dirname points to the function's directory
+    return path.join(__dirname, 'content', 'posts');
+  }
+  // In development
+  return path.join(process.cwd(), 'content', 'posts');
 };
 
 // Posts endpoint
@@ -31,30 +30,47 @@ app.get('/content/posts', async (req, res) => {
     const postsDir = getPostsDirectory();
     console.log('Looking for posts in:', postsDir);
     
-    const files = await fs.readdir(postsDir);
-    console.log('Found files:', files);
+    let files;
+    try {
+      files = await fs.readdir(postsDir);
+      console.log('Found files:', files);
+    } catch (err) {
+      console.error('Error reading posts directory:', err);
+      files = [];
+    }
     
     const posts = await Promise.all(
       files
         .filter(file => file.endsWith('.md'))
         .map(async file => {
-          const content = await fs.readFile(path.join(postsDir, file), 'utf-8');
-          const { data, content: markdown } = matter(content);
-          console.log('Parsed post:', file, data);
-          return {
-            ...data,
-            slug: file.replace('.md', ''),
-            body: markdown.trim()
-          };
+          try {
+            const content = await fs.readFile(path.join(postsDir, file), 'utf-8');
+            const { data, content: markdown } = matter(content);
+            console.log('Parsed post:', file, data);
+            return {
+              ...data,
+              slug: file.replace('.md', ''),
+              body: markdown.trim()
+            };
+          } catch (err) {
+            console.error('Error reading file:', file, err);
+            return null;
+          }
         })
     );
     
-    console.log(`Found ${posts.length} posts`);
-    res.json(posts.sort((a, b) => new Date(b.date) - new Date(a.date)));
+    const validPosts = posts.filter(post => post !== null);
+    console.log(`Found ${validPosts.length} valid posts`);
+    res.json(validPosts.sort((a, b) => new Date(b.date) - new Date(a.date)));
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error('Error in posts endpoint:', error);
     res.json([]);
   }
+});
+
+// Handle root path
+app.get('/', (req, res) => {
+  res.json({ status: 'API is running' });
 });
 
 // Serve static files in development
@@ -67,5 +83,4 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Export handler for serverless
-module.exports = app;
-module.exports.handler = serverless(app); 
+exports.handler = serverless(app); 
