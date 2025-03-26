@@ -8,15 +8,11 @@
     echo "Copying posts..."
     cp -r content/posts/* functions/content/posts/ || echo "No posts to copy to functions"
     cp -r content/posts/* public/content/posts/ || echo "No posts to copy to public"
-    echo "Copying entire content directory..."
-    cp -r content functions/ || echo "No content directory to copy"
     echo "Verifying directories and files..."
     echo "Functions content:"
     ls -la functions/content/posts/
     echo "Public content:"
     ls -la public/content/posts/
-    echo "Functions root content:"
-    ls -la functions/content/
   """
   functions = "functions"
 
@@ -38,12 +34,10 @@
 [functions]
   directory = "functions"
   node_bundler = "esbuild"
-  included_files = ["content/posts/*"]
 
 [dev]
   command = "npm run dev"
   targetPort = 3000
   port = 3000
   publish = "public"
-  autoLaunch = true
   framework = "#static" 
