@@ -1,9 +1,9 @@
 [build]
   publish = "public"
   command = """
+    mkdir -p functions/content/posts
+    cp -r content/posts/* functions/content/posts/
     npm install --legacy-peer-deps
-    mkdir -p functions/content
-    cp -r content/* functions/content/
   """
   functions = "functions"
 

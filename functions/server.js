@@ -11,19 +11,9 @@ exports.handler = async function(event, context) {
     try {
         console.log('Fetching posts...');
         
-        // In production, files are in a different location
-        const postsDir = process.env.NETLIFY 
-            ? path.join(__dirname, 'content', 'posts')
-            : path.join(__dirname, '..', 'content', 'posts');
-        
+        // In production, files are in the same directory as the function
+        const postsDir = path.join(__dirname, 'content', 'posts');
         console.log('Posts directory:', postsDir);
-        
-        // Create posts directory if it doesn't exist
-        try {
-            await fs.mkdir(postsDir, { recursive: true });
-        } catch (err) {
-            console.log('Directory already exists or error creating:', err);
-        }
 
         // List all files in the posts directory
         let files;
