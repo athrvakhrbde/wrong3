@@ -1,14 +1,29 @@
 {
   "name": "wrong3",
   "version": "1.0.0",
+  "private": true,
   "dependencies": {
     "netlify-cli": "^15.0.0",
     "@netlify/build": "^28.0.0",
     "@netlify/functions": "^2.0.0",
-    "@netlify/plugin-nextjs": "^4.41.3"
+    "@netlify/plugin-nextjs": "^4.41.3",
+    "next": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "netlify build",
-    "dev": "netlify dev"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
