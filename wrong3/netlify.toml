@@ -2,7 +2,7 @@
   publish = "public"
   command = """
     echo "Installing dependencies..."
-    npm install
+    npm install --legacy-peer-deps
     echo "Creating directories..."
     mkdir -p functions/content/posts public/content/posts
     echo "Copying posts..."
@@ -29,6 +29,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 [functions]
   directory = "functions"
