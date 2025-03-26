@@ -198,7 +198,7 @@
         async function loadPosts() {
             try {
                 console.log('Fetching posts from API...');
-                const response = await fetch('http://localhost:3000/content/posts', {
+                const response = await fetch('/content/posts', {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
