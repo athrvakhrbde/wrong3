@@ -5,10 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "npm ci --legacy-peer-deps",
+    "build": "npm ci",
     "dev": "concurrently \"npm run dev:cms\" \"npm run dev:server\"",
     "dev:cms": "PORT=8082 netlify-cms-proxy-server",
-    "dev:server": "node server.js"
+    "dev:server": "NODE_ENV=development node server.js",
+    "clean": "rm -rf node_modules package-lock.json"
   },
   "dependencies": {
     "express": "^4.18.2",

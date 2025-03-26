@@ -3,7 +3,6 @@ const fs = require('fs').promises;
 const path = require('path');
 const matter = require('gray-matter');
 const cors = require('cors');
-const serverless = require('serverless-http');
 
 const app = express();
 
@@ -16,11 +15,13 @@ app.use(cors({
 
 // Function to get posts directory
 const getPostsDirectory = () => {
+  const isDev = process.env.NODE_ENV !== 'production';
   console.log('Environment:', process.env.NODE_ENV);
   console.log('Current directory:', process.cwd());
-  console.log('Function directory:', __dirname);
 
-  // In Netlify Functions environment
+  if (isDev) {
+    return path.join(process.cwd(), 'content', 'posts');
+  }
   return path.join(__dirname, 'content', 'posts');
 };
 
@@ -79,5 +80,8 @@ app.get('/content/posts', async (req, res) => {
   }
 });
 
-// Export handler for serverless
-exports.handler = serverless(app); 
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+}); 
