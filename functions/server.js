@@ -13,43 +13,18 @@ exports.handler = async function(event, context) {
         console.log('Current directory:', process.cwd());
         console.log('Function directory:', __dirname);
         
-        // Try multiple possible paths for the posts directory
-        const possiblePaths = [
-            path.join(__dirname, 'content', 'posts'),
-            path.join(__dirname, '..', 'content', 'posts'),
-            path.join(process.cwd(), 'content', 'posts'),
-            '/opt/build/repo/content/posts'  // Netlify build directory
-        ];
-        
-        let postsDir;
-        let files = [];
-        
-        // Try each path until we find one that works
-        for (const dir of possiblePaths) {
-            try {
-                console.log('Trying directory:', dir);
-                const stats = await fs.stat(dir);
-                if (stats.isDirectory()) {
-                    postsDir = dir;
-                    files = await fs.readdir(dir);
-                    console.log('Successfully found posts in:', dir);
-                    console.log('Files found:', files);
-                    break;
-                }
-            } catch (err) {
-                console.log('Directory not accessible:', dir, err.message);
-            }
-        }
-        
-        if (!postsDir || files.length === 0) {
-            console.log('No valid posts directory found or directory is empty');
-            // Try to list the root directory to understand the structure
-            try {
-                const rootFiles = await fs.readdir(process.cwd());
-                console.log('Root directory contents:', rootFiles);
-            } catch (err) {
-                console.log('Could not read root directory:', err.message);
-            }
+        // In Netlify, the posts are in the same directory as the function
+        const postsDir = path.join(__dirname, 'content', 'posts');
+        console.log('Looking for posts in:', postsDir);
+
+        // List all files in the posts directory
+        let files;
+        try {
+            const dirContents = await fs.readdir(postsDir);
+            files = dirContents.filter(file => file.endsWith('.md'));
+            console.log('Found markdown files:', files);
+        } catch (err) {
+            console.error('Error reading posts directory:', err);
             return {
                 statusCode: 200,
                 headers: {
@@ -65,25 +40,24 @@ exports.handler = async function(event, context) {
 
         // Process each markdown file
         const posts = await Promise.all(
-            files
-                .filter(file => file.endsWith('.md'))
-                .map(async (file) => {
-                    try {
-                        const filePath = path.join(postsDir, file);
-                        console.log('Reading file:', filePath);
-                        const content = await fs.readFile(filePath, 'utf-8');
-                        console.log('File content:', content.substring(0, 100) + '...');
-                        const { data, content: markdown } = matter(content);
-                        return {
-                            ...data,
-                            slug: file.replace('.md', ''),
-                            body: markdown.trim()
-                        };
-                    } catch (err) {
-                        console.error('Error reading file:', file, err);
-                        return null;
-                    }
-                })
+            files.map(async (file) => {
+                try {
+                    const filePath = path.join(postsDir, file);
+                    console.log('Reading file:', filePath);
+                    const content = await fs.readFile(filePath, 'utf-8');
+                    console.log('File content preview:', content.substring(0, 100));
+                    const { data, content: markdown } = matter(content);
+                    console.log('Parsed frontmatter:', data);
+                    return {
+                        ...data,
+                        slug: file.replace('.md', ''),
+                        body: markdown.trim()
+                    };
+                } catch (err) {
+                    console.error('Error reading file:', file, err);
+                    return null;
+                }
+            })
         );
 
         const validPosts = posts.filter(post => post !== null);

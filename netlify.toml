@@ -2,11 +2,8 @@
   publish = "public"
   command = """
     mkdir -p functions/content/posts
-    cp -r content/posts/* functions/content/posts/ || true
-    cp -r content functions/ || true
-    cp -r content /opt/build/repo/ || true
+    cp content/posts/* functions/content/posts/ || true
     ls -la functions/content/posts/
-    ls -la /opt/build/repo/content/posts/
     npm install --legacy-peer-deps
   """
   functions = "functions"
