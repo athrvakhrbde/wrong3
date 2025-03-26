@@ -1,15 +1,6 @@
-# Basic build settings
 [build]
-  # Use our custom build script
-  command = "./netlify.sh"
-  # Directory to publish
+  command = "npm run build"
   publish = ".next"
 
-# Environment variables
-[build.environment]
-  # Use Node.js 16
-  NODE_VERSION = "16"
-  # Disable Netlify plugins
-  NETLIFY_SKIP_PLUGINS = "true"
-  # Skip Netlify's automatic plugin installation
-  NETLIFY_USE_PLUGINS = "false"
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
