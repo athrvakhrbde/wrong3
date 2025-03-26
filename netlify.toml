@@ -1,6 +1,10 @@
 [build]
   publish = "public"
-  command = "npm run build"
+  command = """
+    npm install --legacy-peer-deps
+    mkdir -p functions/content
+    cp -r content/* functions/content/
+  """
   functions = "functions"
 
 [[redirects]]

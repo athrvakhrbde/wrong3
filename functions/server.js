@@ -10,29 +10,63 @@ exports.handler = async function(event, context) {
 
     try {
         console.log('Fetching posts...');
-        // Use path relative to the function
-        const postsDir = path.join(__dirname, '..', 'content', 'posts');
         
+        // In production, files are in a different location
+        const postsDir = process.env.NETLIFY 
+            ? path.join(__dirname, 'content', 'posts')
+            : path.join(__dirname, '..', 'content', 'posts');
+        
+        console.log('Posts directory:', postsDir);
+        
+        // Create posts directory if it doesn't exist
+        try {
+            await fs.mkdir(postsDir, { recursive: true });
+        } catch (err) {
+            console.log('Directory already exists or error creating:', err);
+        }
+
         // List all files in the posts directory
-        const files = await fs.readdir(postsDir);
-        console.log('Found files:', files);
+        let files;
+        try {
+            files = await fs.readdir(postsDir);
+            console.log('Found files:', files);
+        } catch (err) {
+            console.error('Error reading directory:', err);
+            return {
+                statusCode: 200,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Cache-Control': 'no-cache'
+                },
+                body: JSON.stringify([])
+            };
+        }
 
         // Process each markdown file
         const posts = await Promise.all(
             files
                 .filter(file => file.endsWith('.md'))
                 .map(async (file) => {
-                    const content = await fs.readFile(path.join(postsDir, file), 'utf-8');
-                    const { data, content: markdown } = matter(content);
-                    return {
-                        ...data,
-                        slug: file.replace('.md', ''),
-                        body: markdown.trim()
-                    };
+                    try {
+                        const content = await fs.readFile(path.join(postsDir, file), 'utf-8');
+                        const { data, content: markdown } = matter(content);
+                        return {
+                            ...data,
+                            slug: file.replace('.md', ''),
+                            body: markdown.trim()
+                        };
+                    } catch (err) {
+                        console.error('Error reading file:', file, err);
+                        return null;
+                    }
                 })
         );
 
-        console.log(`Found ${posts.length} posts`);
+        const validPosts = posts.filter(post => post !== null);
+        console.log(`Found ${validPosts.length} valid posts`);
         
         return {
             statusCode: 200,
@@ -43,17 +77,20 @@ exports.handler = async function(event, context) {
                 'Access-Control-Allow-Headers': 'Content-Type',
                 'Cache-Control': 'no-cache'
             },
-            body: JSON.stringify(posts.sort((a, b) => new Date(b.date) - new Date(a.date)))
+            body: JSON.stringify(validPosts.sort((a, b) => new Date(b.date) - new Date(a.date)))
         };
     } catch (error) {
-        console.error('Error reading posts:', error);
+        console.error('Error in handler:', error);
         return {
-            statusCode: 500,
+            statusCode: 200, // Return 200 even on error, with empty array
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Cache-Control': 'no-cache'
             },
-            body: JSON.stringify({ error: error.message })
+            body: JSON.stringify([])
         };
     }
 }; 
