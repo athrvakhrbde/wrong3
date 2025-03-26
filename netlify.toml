@@ -13,7 +13,10 @@
 [dev]
   framework = "#static"
   command = "npm start"
-  targetPort = 8888
-  port = 8888
+  targetPort = 3000
+  port = 3000
   publish = "public"
-  autoLaunch = true 
+  autoLaunch = true
+
+[[plugins]]
+package = "@netlify/plugin-local-install-core" 
