@@ -2,9 +2,12 @@
   publish = "public"
   command = "npm run build"
 
+[functions]
+  directory = "functions"
+
 [[redirects]]
-  from = "/content/*"
-  to = "/.netlify/functions/content/:splat"
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
 
 [[redirects]]
@@ -17,10 +20,11 @@
   NPM_FLAGS = "--legacy-peer-deps"
 
 [dev]
-  command = "npm start"
+  framework = "#custom"
+  command = "npm run dev"
   targetPort = 3000
   port = 8000
-  framework = "#custom"
+  publish = "public"
 
 [[plugins]]
   package = "@netlify/plugin-local-install-core" 
