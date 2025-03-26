@@ -95,10 +95,12 @@
             padding: 1rem;
             border: 1px solid #333;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .post:hover {
             border-color: #666;
+            transform: translateY(-2px);
         }
 
         .post h2 {
@@ -115,6 +117,14 @@
 
         .post-excerpt {
             color: #888;
+        }
+
+        .post-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border-radius: 4px;
         }
 
         footer {
@@ -184,29 +194,45 @@
             });
         }
 
+        // Function to create post HTML
+        function createPostHTML(post) {
+            return `
+                <article class="post">
+                    ${post.thumbnail ? `<img src="${post.thumbnail}" alt="${post.title}" class="post-image">` : ''}
+                    <h2>${post.title}</h2>
+                    <div class="post-meta">
+                        ${formatDate(post.date)} • ${post.categories || 'uncategorized'}
+                    </div>
+                    <div class="post-excerpt">
+                        ${post.body.slice(0, 200)}...
+                    </div>
+                </article>
+            `;
+        }
+
         // Function to load posts
         async function loadPosts() {
             try {
-                const response = await fetch('/content/posts');
+                const response = await fetch('content/posts');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch posts');
+                }
                 const posts = await response.json();
                 const postsContainer = document.getElementById('posts-container');
                 
-                posts.forEach(post => {
-                    const postElement = document.createElement('article');
-                    postElement.className = 'post';
-                    postElement.innerHTML = `
-                        <h2>${post.title}</h2>
-                        <div class="post-meta">
-                            ${formatDate(post.date)} • ${post.categories}
-                        </div>
-                        <div class="post-excerpt">
-                            ${post.body.substring(0, 200)}...
-                        </div>
-                    `;
-                    postsContainer.appendChild(postElement);
-                });
+                if (posts.length === 0) {
+                    postsContainer.innerHTML = '<p style="text-align: center; color: #666;">No posts yet. Create one in the <a href="/admin" style="color: #888;">admin panel</a>.</p>';
+                    return;
+                }
+
+                postsContainer.innerHTML = posts
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .map(createPostHTML)
+                    .join('');
             } catch (error) {
                 console.error('Error loading posts:', error);
+                document.getElementById('posts-container').innerHTML = 
+                    '<p style="text-align: center; color: #666;">Error loading posts. Please try again later.</p>';
             }
         }
 
