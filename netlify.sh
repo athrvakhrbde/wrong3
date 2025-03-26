@@ -1,18 +1,19 @@
 #!/bin/bash
 
-# Display current directory
+# Display environment information
+echo "===== ENVIRONMENT INFO ====="
+echo "Node version: $(node -v)"
+echo "NPM version: $(npm -v)"
 echo "Current directory: $(pwd)"
-
-# List files in current directory
-echo "Files in current directory:"
+echo "Directory contents:"
 ls -la
 
-# Run the build command
-echo "Running npm run build..."
+# Clean install without any optional dependencies
+echo "\n===== INSTALLING DEPENDENCIES ====="
+npm ci --no-optional --no-audit --no-fund --prefer-offline
+
+# Build the Next.js application
+echo "\n===== BUILDING NEXT.JS APP ====="
 npm run build
 
-# Create the publish directory if it doesn't exist
-mkdir -p .next
-
-# Copy the build output to the publish directory
-echo "Build completed successfully!"
+echo "\n===== BUILD COMPLETED ====="
