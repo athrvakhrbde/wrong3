@@ -1,6 +1,9 @@
 [build]
-  command = "npm run build"
-  publish = "out"
+  command = "mkdir -p functions/content/posts && cp content/posts/* functions/content/posts/ || true && ls -la functions/content/posts/ && npm install --legacy-peer-deps"
+  publish = "public"
 
 [build.environment]
   NODE_VERSION = "18.20.8"
+
+[functions]
+  directory = "functions"
