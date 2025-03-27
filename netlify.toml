@@ -1,6 +1,7 @@
 [build]
-  command = "echo 'Installing dependencies...' && npm install && echo 'Creating directories...' && mkdir -p functions/content/posts public/content/posts && echo 'Copying posts...' && cp -r content/posts/* functions/content/posts/ || echo 'No posts to copy to functions' && cp -r content/posts/* public/content/posts/ || echo 'No posts to copy to public' && echo 'Verifying posts...' && ls -la functions/content/posts/ && ls -la public/content/posts/"
+  command = "npm install && npm run build"
   publish = "public"
+  functions = "netlify/functions"
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
@@ -11,4 +12,4 @@
   skip_processing = true
 
 [functions]
-  directory = "functions"
+  directory = "netlify/functions"
