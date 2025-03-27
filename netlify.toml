@@ -1,10 +1,17 @@
 [build]
   command = "npm install && npm run build"
   publish = "out"
+  ignore = "git diff --quiet HEAD^ HEAD ./"
 
 [build.environment]
   NODE_VERSION = "18.20.8"
   NPM_VERSION = "10.9.2"
+  NETLIFY_USE_TOML = "true"
+  NETLIFY_IGNORE_PRESET = "true"
 
 [build.processing]
   skip_processing = true
+
+[functions]
+  external_node_modules = []
+  included_files = []
