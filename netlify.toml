@@ -1,19 +1,25 @@
 [build]
-  command = "npm run build"
+  command = "npm ci && npm run build"
   publish = ".next"
   ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ."
-  timeout = 300
+  timeout = 900
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "18"
   NPM_VERSION = "10"
+  CI = "1"
+  NETLIFY_USE_YARN = "false"
+  NEXT_WEBPACK_CACHE = "true"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  [plugins.inputs]
+    skipBuildCache = "false"
+    experimentalLargeMediaSupport = "true"
 
 [build.processing]
-  skip_processing = true
+  skip_processing = false
 
 [build.processing.html]
   pretty_urls = true
@@ -36,3 +42,16 @@
 [functions]
   directory = "functions"
   node_bundler = "esbuild"
+  included_files = ["content/posts/**"]
+
+[context.production]
+  command = "npm ci && npm run build"
+
+[context.deploy-preview]
+  command = "npm ci && npm run build"
+
+[context.branch-deploy]
+  command = "npm ci && npm run build"
+
+[build.environment.production]
+  NODE_ENV = "production"
