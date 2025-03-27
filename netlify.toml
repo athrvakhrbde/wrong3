@@ -5,14 +5,6 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "10"
-  NEXT_TELEMETRY_DISABLED = "1"
-  NEXT_SHARP_PATH = "/tmp/node_modules/sharp"
 
 [build.processing]
   skip_processing = true
-
-[functions]
-  node_bundler = "esbuild"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
