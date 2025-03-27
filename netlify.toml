@@ -1,5 +1,5 @@
 [build]
-  command = "mkdir -p functions/content/posts && cp content/posts/* functions/content/posts/ || true && ls -la functions/content/posts/ && npm install --legacy-peer-deps"
+  command = "echo 'Installing dependencies...' && npm install && echo 'Creating directories...' && mkdir -p functions/content/posts public/content/posts && echo 'Copying posts...' && cp -r content/posts/* functions/content/posts/ || echo 'No posts to copy to functions' && cp -r content/posts/* public/content/posts/ || echo 'No posts to copy to public' && echo 'Verifying posts...' && ls -la functions/content/posts/ && ls -la public/content/posts/"
   publish = "public"
 
 [build.environment]
