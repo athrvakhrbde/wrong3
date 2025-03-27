@@ -2,11 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  output: 'export',
+  target: 'serverless',
   images: {
     unoptimized: true
-  },
-  target: 'serverless'
+  }
 }
 
 module.exports = nextConfig
