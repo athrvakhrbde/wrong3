@@ -10,8 +10,6 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    nextjsBasePath = ""
 
 [build.processing]
   skip_processing = false
