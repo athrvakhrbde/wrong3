@@ -1,15 +1,6 @@
 [build]
-  command = "npm install && npm run build"
-  publish = "public"
-  functions = "netlify/functions"
+  command = "npm run build"
+  publish = "out"
 
 [build.environment]
-  NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "18.20.8"
-  NPM_FLAGS = "--no-optional"
-
-[build.processing]
-  skip_processing = true
-
-[functions]
-  directory = "netlify/functions"
