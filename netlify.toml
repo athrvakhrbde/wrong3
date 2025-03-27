@@ -1,10 +1,10 @@
 [build]
   command = "npm install && npm run build"
-  publish = ".next"
+  publish = "out"
 
 [build.environment]
-  NODE_VERSION = "18"
-  NPM_VERSION = "10"
+  NODE_VERSION = "18.20.8"
+  NPM_VERSION = "10.9.2"
 
 [build.processing]
   skip_processing = true
