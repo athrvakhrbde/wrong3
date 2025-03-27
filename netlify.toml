@@ -1,6 +1,7 @@
 [build]
-  command = "npm run build"
+  command = "npm ci && npm run build"
   publish = ".next"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ."
 
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
@@ -10,6 +11,8 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  [plugins.inputs]
+    nextConfigDir = "."
 
 [build.processing]
   skip_processing = false

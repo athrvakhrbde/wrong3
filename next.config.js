@@ -1,7 +1,12 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
   reactStrictMode: true,
   target: 'serverless',
+  swcMinify: true,
+  images: {
+    domains: [],
+    unoptimized: true
+  },
   webpack: (config, { isServer }) => {
     // Fix npm packages that depend on `fs` module
     if (!isServer) {
@@ -13,3 +18,5 @@ module.exports = {
     return config;
   },
 }
+
+module.exports = nextConfig
