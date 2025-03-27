@@ -5,13 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "export": "next export"
+    "start": "next start"
   },
   "dependencies": {
-    "next": "13.5.6",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "next": "12.3.4",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
   },
   "engines": {
     "node": ">=18.0.0"
