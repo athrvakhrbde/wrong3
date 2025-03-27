@@ -1,6 +1,38 @@
 [build]
   command = "npm run build"
   publish = ".next"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ."
+  timeout = 300
+
+[build.environment]
+  NEXT_TELEMETRY_DISABLED = "1"
+  NODE_VERSION = "18"
+  NPM_VERSION = "10"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[build.processing]
+  skip_processing = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.images]
+  compress = true
+
+[deploy]
+  concurrency = 1
+  max_concurrent_builds = 1
+
+[functions]
+  directory = "functions"
+  node_bundler = "esbuild"
