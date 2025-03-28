@@ -1,6 +1,31 @@
+import { useState, useEffect } from 'react'
 import Head from 'next/head'
 
 export default function Home() {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        console.log('Fetching posts from API...');
+        const response = await fetch('/api/posts');
+        const data = await response.json();
+        console.log('Received posts:', data);
+        setPosts(data);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+    // Set up polling - fetch every 5 seconds
+    const interval = setInterval(fetchPosts, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="container">
       <Head>
@@ -18,6 +43,24 @@ export default function Home() {
           Get started by editing{' '}
           <code className="code">pages/index.js</code>
         </p>
+
+        <div className="posts-section">
+          <h2>Posts</h2>
+          {loading ? (
+            <p>Loading posts...</p>
+          ) : posts.length > 0 ? (
+            <ul className="posts-list">
+              {posts.map((post, index) => (
+                <li key={index} className="post-item">
+                  <h3>{post.title}</h3>
+                  <p>{post.content}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No posts found. Please check your content directory.</p>
+          )}
+        </div>
       </main>
 
       <style jsx>{`
@@ -70,6 +113,28 @@ export default function Home() {
           font-size: 1.1rem;
           font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
             DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+        }
+
+        .posts-section {
+          margin-top: 2rem;
+          width: 100%;
+          max-width: 800px;
+        }
+
+        .posts-list {
+          list-style-type: none;
+          padding: 0;
+        }
+
+        .post-item {
+          margin-bottom: 1.5rem;
+          padding: 1rem;
+          border: 1px solid #eaeaea;
+          border-radius: 10px;
+        }
+
+        .post-item h3 {
+          margin: 0 0 0.5rem 0;
         }
       `}</style>
 
